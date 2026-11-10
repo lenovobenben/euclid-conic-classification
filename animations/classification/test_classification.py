@@ -1,11 +1,12 @@
 """Check the actual animation's construction dependencies and screen geometry."""
 
 import json
+import tempfile
 import unittest
 from pathlib import Path
 
 import numpy as np
-from manim import Dot, Line, LEFT, RIGHT
+from manim import Dot, Line, LEFT, RIGHT, tempconfig
 
 from classification import ConicClassification
 
@@ -28,7 +29,9 @@ class TangentProbe(ConicClassification):
         self.trace = trace
         self.drawn_lines = []
         self.construction_lines = []
-        self.markers = {}
+        self.middle = np.zeros(3)
+        self.scale = 1
+        self.markers = {"U": (Dot(self.at(trace["others"][2])), Dot())}
         self.captions = []
 
     def caption(self, content):
@@ -75,6 +78,9 @@ class TangentProbe(ConicClassification):
     def text(self, *args, **kwargs):
         return Dot(radius=0.01)
 
+    def tangent_detail(self, trace):
+        return Dot()
+
     def play(self, *args, **kwargs):
         pass
 
@@ -83,6 +89,51 @@ class TangentProbe(ConicClassification):
 
 
 class AnimationLogicTests(unittest.TestCase):
+    def test_tangent_marker_separation_and_detail(self):
+        data = json.loads(Path(__file__).with_name("geometry.json").read_text("utf-8"))
+        with tempfile.TemporaryDirectory() as directory, tempconfig({
+            "media_dir": directory, "dry_run": True, "skip_animations": True,
+            "progress_bar": "none", "verbosity": "ERROR",
+        }):
+            for case in data["scenes"]:
+                if case["tangent"] is None:
+                    continue
+                with self.subTest(category=case["category"]):
+                    scene = ConicClassification()
+                    scene.middle = np.array([*np.mean(case["points"], axis=0), 0])
+                    scene.scale = 2.05 if case["category"] == "ellipse" else 1.5375
+                    scene.markers = {}
+                    scene.construction_lines = []
+                    trace = case["tangent"]
+                    scene.mark("U", trace["others"][2])
+                    scene.draw_tangent(trace)
+                    u_dot, u_label = scene.markers["U"]
+                    q_dot, q_label = scene.markers["Q"]
+                    distance = np.linalg.norm(u_dot.get_center() - q_dot.get_center())
+                    self.assertGreater(distance, (u_dot.width + q_dot.width) / 2)
+                    for dot, label, other in ((u_dot, u_label, q_dot), (q_dot, q_label, u_dot)):
+                        self.assertLess(np.linalg.norm(label.get_center() - dot.get_center()),
+                                        np.linalg.norm(label.get_center() - other.get_center()))
+                    detail = scene.tangent_detail(trace)
+                    for name in ("U", "T", "Q"):
+                        dot, label, leader = detail[name]
+                        for other_name in ("U", "T", "Q"):
+                            if name == other_name:
+                                continue
+                            other_dot = detail[other_name][0]
+                            self.assertGreater(np.linalg.norm(dot.get_center() - other_dot.get_center()),
+                                               (dot.width + other_dot.width) / 2 + 0.1)
+                            self.assertLess(np.linalg.norm(label.get_center() - dot.get_center()),
+                                            np.linalg.norm(label.get_center() - other_dot.get_center()))
+                    # Every magnified parent line passes through its constructed intersection.
+                    for point_name, indices in (("U", (0, 2)), ("T", (0, 1, 3)), ("Q", (2, 3, 4))):
+                        dot = detail[point_name][0]
+                        for index in indices:
+                            line = detail["lines"][index]
+                            coefficients = through(line.get_start()[:2], line.get_end()[:2])
+                            residual = abs(np.dot(coefficients, [*dot.get_center()[:2], 1]))
+                            self.assertLess(residual / np.linalg.norm(coefficients[:2]), 1e-8)
+
     def test_movie_tangent_dependencies(self):
         data = json.loads(Path(__file__).with_name("geometry.json").read_text("utf-8"))
         for scene in data["scenes"]:

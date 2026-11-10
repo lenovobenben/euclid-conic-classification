@@ -10,7 +10,7 @@ The input is promised to lie on a nondegenerate real conic, with circles exclude
 
 [![Classification using parallel chords, diameters and a tangent](animations/classification/preview.png)](https://raw.githubusercontent.com/lenovobenben/euclid-conic-classification/main/animations/classification/media/ConicClassification_4k60.mp4)
 
-*Click the preview to view or download the animation, 3840 × 2160, 60 fps, 75.35 seconds.*
+*Click the preview to view or download the animation, 3840 × 2160, 60 fps, 79.55 seconds.*
 
 ## Explore the construction
 
@@ -22,7 +22,7 @@ The video has Chinese captions and follows Euclid-CCC-Min's dark-blue background
 
 One opening page summarizes the principle. The remainder shows parallel chords, chord midpoints, two diameters, the center and a tangent. Midpoints and parallels use standard straightedge-and-compass macros, with some routine auxiliary circles omitted. Detailed reasoning is provided in the documents.
 
-Geometry is exported after exact verification, and Manim checks its data hash when loading. Both central-conic examples use a parallel branch of the five-point tangent construction. The ellipse example explicitly identifies the existing midpoint $M_2$ with the center $O$. See the [animation guide](animations/classification/README.md) for the storyboard, construction-order tests and rendering.
+Geometry is exported after exact verification, and Manim checks its data hash when loading. Both central-conic examples use a parallel branch of the five-point tangent construction. A close-up of $U,T,Q$ follows the completed tangent, with leader lines identifying the point labels. The ellipse example explicitly identifies the existing midpoint $M_2$ with the center $O$. See the [animation guide](animations/classification/README.md) for the storyboard, construction-order tests and rendering.
 
 ## Current classification results and scope
 
@@ -79,7 +79,7 @@ Formal decisions use rational numbers, polynomial rings and the exact real algeb
 | Five-point tangents | 388 passed, with exact checks for all five branch types | [Geometric verification](experiments/verify_geometry.py) |
 | Independent algebraic route | 18 identities and interpolation witnesses, plus 1,920 point permutations passed | [Five-point classification and independent equation recovery](experiments/conic_classifier.py) |
 | Arithmetic appendix and invalid inputs | 95 arithmetic checks passed, with zero-divisor and five invalid-input rejections | [Unified verification entry point](experiments/verify.py) |
-| Animation actions and display geometry | Three regression groups passed, checking parent-object order, tangent branches and screen incidence | [Animation tests](animations/classification/test_classification.py) |
+| Animation actions and display geometry | Four regression groups passed, checking parent-object order, tangent branches, nearby point labels and incidence in the main diagram and close-up | [Animation tests](animations/classification/test_classification.py) |
 
 Fixtures include tiny arcs with parameter spacing $10^{-12}$ and near-parabolic conics with parameters $\pm10^{-30}$. General proofs establish full-domain coverage. Exact fixtures and animation checks verify the implementation and presentation. [Verification layers](docs/VERIFICATION.md)
 

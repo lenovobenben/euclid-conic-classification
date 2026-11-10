@@ -10,7 +10,7 @@
 
 [![平行弦、直径与切线的尺规判定](animations/classification/preview.png)](https://raw.githubusercontent.com/lenovobenben/euclid-conic-classification/main/animations/classification/media/ConicClassification_4k60.mp4)
 
-*点击预览图查看或下载动画，3840 × 2160，60 fps，75.35 秒。*
+*点击预览图查看或下载动画，3840 × 2160，60 fps，79.55 秒。*
 
 ## 先看演示
 
@@ -22,7 +22,7 @@
 
 开头一页简述原理，随后连续演示平行弦、弦中点、两条直径、中心与切线。中点和平行线采用通常尺规宏，部分标准辅助圆省略。详细原理在专门文档中展开。
 
-几何数据由正式精确重放导出，Manim 加载时核对数据哈希。两个中心型案例采用五点切线的平行分支，椭圆案例还明确标注已有中点 $M_2$ 与中心 $O$ 重合。分镜、动作顺序检查和重新渲染见 [动画说明](animations/classification/README.md)。
+几何数据由正式精确重放导出，Manim 加载时核对数据哈希。两个中心型案例采用五点切线的平行分支，切线作成后局部放大 $U,T,Q$ 并以引线明确标签归属。椭圆案例还明确标注已有中点 $M_2$ 与中心 $O$ 重合。分镜、动作顺序检查和重新渲染见 [动画说明](animations/classification/README.md)。
 
 ## 当前判定结果与范围
 
@@ -79,7 +79,7 @@
 | 五点切线 | 388 次通过，全部五类分支有精确检查 | [几何核验](experiments/verify_geometry.py) |
 | 独立代数核验 | 18 项恒等式与插值见证、1,920 种点名排列通过 | [五点判定与独立方程恢复](experiments/conic_classifier.py) |
 | 尺规算术附录与非法输入对照 | 95 项算术检查通过，零除数及 5 项非法输入被拒绝 | [统一核验入口](experiments/verify.py) |
-| 动画动作与显示几何 | 3 组回归测试通过，检查父对象顺序、切线分支和屏幕点线关联 | [动画测试](animations/classification/test_classification.py) |
+| 动画动作与显示几何 | 4 组回归测试通过，检查父对象顺序、切线分支、近点标注及屏幕与放大图的点线关联 | [动画测试](animations/classification/test_classification.py) |
 
 案例包括参数间距 $10^{-12}$ 的短弧，以及参数为 $\pm10^{-30}$ 的近抛物线曲线。全域覆盖由一般证明保证，精确案例和动画检查用于核对程序实现与展示。[核验层次说明](docs/VERIFICATION.md)
 

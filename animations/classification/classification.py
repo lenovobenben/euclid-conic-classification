@@ -6,8 +6,8 @@ from pathlib import Path
 
 import numpy as np
 from manim import (
-    Create, DashedLine, Dot, FadeIn, FadeOut, Line, Scene, Text,
-    VGroup, VMobject, Write, DOWN, LEFT, RIGHT, UP, config,
+    Create, DashedLine, Dot, FadeIn, FadeOut, Line, Rectangle, Scene, Text,
+    VDict, VGroup, VMobject, Write, DOWN, LEFT, RIGHT, UP, config,
 )
 
 
@@ -21,6 +21,27 @@ CURRENT = "#FFC857"
 AUXILIARY = "#8AC6D9"
 RESULT = "#5DE2A5"
 NAMES = {"ellipse": "椭圆", "parabola": "抛物线", "hyperbola": "双曲线"}
+
+
+def clipped_line(coefficients, bounds, color):
+    a, b, c = coefficients
+    left, right, bottom, top = bounds
+    candidates = []
+    if abs(b) > 1e-12:
+        for x in (left, right):
+            y = -(a * x + c) / b
+            if bottom <= y <= top:
+                candidates.append(np.array([x, y, 0]))
+    if abs(a) > 1e-12:
+        for y in (bottom, top):
+            x = -(b * y + c) / a
+            if left <= x <= right:
+                candidates.append(np.array([x, y, 0]))
+    if len(candidates) < 2:
+        raise ValueError("a displayed construction line is outside the viewport")
+    first, second = max(((p, q) for p in candidates for q in candidates),
+                        key=lambda pair: np.linalg.norm(pair[0] - pair[1]))
+    return Line(first, second, color=color, stroke_width=1.5)
 
 
 class ConicClassification(Scene):
@@ -72,22 +93,7 @@ class ConicClassification(Scene):
         # Transform the exact-exported line into screen coordinates for clipping.
         a, b, c = a / self.scale, b / self.scale, c + a * self.middle[0] + b * self.middle[1]
         c += b * 0.15
-        candidates = []
-        if abs(b) > 1e-12:
-            for x in (-6.1, 6.1):
-                y = -(a * x + c) / b
-                if -2.65 <= y <= 2.25:
-                    candidates.append(np.array([x, y, 0]))
-        if abs(a) > 1e-12:
-            for y in (-2.65, 2.25):
-                x = -(b * y + c) / a
-                if -6.1 <= x <= 6.1:
-                    candidates.append(np.array([x, y, 0]))
-        if len(candidates) < 2:
-            raise ValueError("a displayed construction line is outside the viewport")
-        first, second = max(((p, q) for p in candidates for q in candidates),
-                            key=lambda pair: np.linalg.norm(pair[0] - pair[1]))
-        return Line(first, second, color=color, stroke_width=1.5)
+        return clipped_line((a, b, c), (-6.1, 6.1, -2.65, 2.25), color)
 
     def mark(self, name, point, direction=RIGHT, color=AUXILIARY):
         position = self.at(point)
@@ -99,6 +105,12 @@ class ConicClassification(Scene):
                 break
         else:
             dot = Dot(position, radius=0.043, color=color)
+        for old_dot, old_label in self.markers.values():
+            distance = np.linalg.norm(old_dot.get_center() - position)
+            radius = distance / 3
+            if distance > 1e-6 and distance < (dot.width + old_dot.width) / 2 + 0.02:
+                dot.scale_to_fit_width(min(dot.width, 2 * radius))
+                old_dot.scale_to_fit_width(min(old_dot.width, 2 * radius))
         label = self.text(name, 23, color)
         directions = [direction, UP, DOWN, LEFT, RIGHT, UP + LEFT, DOWN + RIGHT, UP + RIGHT, DOWN + LEFT]
         placed = False
@@ -112,7 +124,10 @@ class ConicClassification(Scene):
                         continue
                     old_box = [old_label.get_corner(DOWN + LEFT), old_label.get_center(),
                                old_label.get_corner(UP + RIGHT)]
-                    if (box[0][0] < old_box[2][0] + 0.08 and box[2][0] > old_box[0][0] - 0.08
+                    closer_to_other = (np.linalg.norm(label.get_center() - old_dot.get_center())
+                                       <= np.linalg.norm(label.get_center() - position))
+                    if closer_to_other or (box[0][0] < old_box[2][0] + 0.08
+                            and box[2][0] > old_box[0][0] - 0.08
                             and box[0][1] < old_box[2][1] + 0.06 and box[2][1] > old_box[0][1] - 0.06):
                         overlaps = True
                         break
@@ -231,6 +246,11 @@ class ConicClassification(Scene):
         def through(first, second):
             return np.cross([*first, 1], [*second, 1])
 
+        if trace["auxiliary"] is not None:
+            away_from_q = self.at(c) - self.at(trace["auxiliary"])
+            dot, label = self.markers["U"]
+            label.next_to(dot, away_from_q, buff=0.16)
+
         self.draw_line(through(a, b), "连接 BC，开始五点切线构造")
         self.draw_line(through(d, at), "连接 DA")
         self.draw_line(through(c, d), "连接 UD")
@@ -246,7 +266,7 @@ class ConicClassification(Scene):
                 else "UD 与 AB 平行，过 S 作其平行线")
             self.draw_line(trace["pascal_line"], caption)
         if trace["auxiliary"] is not None:
-            self.mark("Q", trace["auxiliary"], DOWN)
+            self.mark("Q", trace["auxiliary"], self.at(trace["auxiliary"]) - self.at(c), CURRENT)
         self.caption("连接 AQ，得到 A 处切线 t" if trace["auxiliary"] is not None
                      else "过 A 作 CU 的平行线，得到切线 t")
         tangent = self.drawable_line(trace["tangent"], RESULT)
@@ -254,12 +274,53 @@ class ConicClassification(Scene):
         tangent_label.next_to(tangent.point_from_proportion(0.18), UP, buff=0.12)
         self.play(Create(tangent), FadeIn(tangent_label), run_time=0.9)
         self.wait(0.8)
+        if trace["auxiliary"] is not None:
+            detail = self.tangent_detail(trace)
+            self.play(FadeIn(detail), run_time=0.4)
+            self.wait(1.4)
+            self.play(FadeOut(detail), run_time=0.3)
         for line in self.construction_lines:
             line.set_opacity(0.1)
         for name in ("S", "T", "Q", "C", "D", "U"):
             if name in self.markers:
                 for item in self.markers[name]:
                     item.set_opacity(0.2)
+
+    def tangent_detail(self, trace):
+        """Magnify the constructed U/Q neighborhood with the same affine map for every object."""
+        nearby_name = "T" if trace["second"] is not None else "S"
+        raw_points = {"U": np.array(trace["others"][2]),
+                      nearby_name: np.array(trace["second"] if nearby_name == "T" else trace["first"]),
+                      "Q": np.array(trace["auxiliary"])}
+        low, high = np.min(list(raw_points.values()), axis=0), np.max(list(raw_points.values()), axis=0)
+        focus = (low + high) / 2
+        scale = min(2.3 / max(high[0] - low[0], 1e-12), 1.1 / max(high[1] - low[1], 1e-12))
+        offset = np.array([-4.2, 1.1])
+        background = Rectangle(width=3.5, height=2.6, color=MUTED, stroke_width=1,
+                               fill_color=BACKGROUND, fill_opacity=1).move_to([-4.2, 1.35, 0])
+        detail = VDict({"background": background,
+                        "title": self.text("局部放大", 22).move_to([-4.2, 2.3, 0])})
+        a, b, c, d = trace["others"]
+        nearby_parents = [(c, d), (trace["at"], a)] if nearby_name == "T" else [(a, b), (d, trace["at"])]
+        parents = [np.cross([*first, 1], [*second, 1]) for first, second in nearby_parents]
+        parents.extend([np.cross([*b, 1], [*c, 1]), trace["pascal_line"], trace["tangent"]])
+        lines = VGroup()
+        for index, coefficients in enumerate(parents):
+            normal = np.array(coefficients[:2]) / scale
+            constant = coefficients[2] + np.dot(coefficients[:2], focus) - np.dot(normal, offset)
+            lines.add(clipped_line((*normal, constant), (-5.8, -2.6, 0.35, 1.95),
+                                   RESULT if index == len(parents) - 1 else AUXILIARY))
+        detail.add([("lines", lines)])
+        for name, raw in raw_points.items():
+            position = np.array([*((raw - focus) * scale + offset), 0])
+            color = CURRENT if name == "Q" else AUXILIARY
+            dot = Dot(position, radius=0.035, color=color)
+            direction = RIGHT if name == "U" else DOWN + LEFT if name == "Q" else UP + LEFT
+            label = self.text(name, 23, color).next_to(dot, direction, buff=0.16)
+            leader = Line(dot.get_center(), label.get_edge_center(-direction), color=color,
+                          stroke_width=0.8, buff=0.05)
+            detail.add([(name, VGroup(dot, label, leader))])
+        return detail
 
     def show_result(self, category):
         result = self.text(f"判定结果 · {category}", 34, RESULT).move_to([3.6, 2.65, 0])

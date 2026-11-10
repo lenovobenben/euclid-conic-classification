@@ -2,7 +2,7 @@
 
 [观看 4K60 正式版](media/ConicClassification_4k60.mp4)
 
-正式成片为 3840 × 2160、60 fps，时长 75.35 秒，文件约 11.68 MB。
+正式成片为 3840 × 2160、60 fps，时长 79.55 秒，文件约 12.47 MB。
 
 ![直径、中心与切线判定](preview.png)
 
@@ -24,7 +24,7 @@
 | 第二组平行弦 | 复用 $AC$ 中点，画 $AD$ 平行线，标出 $W,X$，连接两弦中点 |
 | 抛物线分支 | 高亮两条平行直径，给出类别 |
 | 中心型分支 | 标出两直径交点 $O$ |
-| 五点切线 | 逐条连接辅助线，遇平行关系时展示对应过点平行线，作出 $A$ 处切线 |
+| 五点切线 | 逐条连接辅助线，遇平行关系时展示对应过点平行线，作出 $A$ 处切线，再局部放大 $U,T,Q$ |
 | 椭圆或双曲线 | 连接 $OB$，观察 $O,B$ 相对于切线 $t$ 的同侧、异侧关系，给出类别 |
 
 三个案例独立地从给定弧开始。主流程在 [ANSWER](../../docs/ANSWER.md) 中逐步列出。
@@ -53,7 +53,7 @@ docker run --rm --network none -e PYTHONDONTWRITEBYTECODE=1 -v "${PWD}:/manim" -
 docker run --rm --network none -e PYTHONDONTWRITEBYTECODE=1 -v "${PWD}:/manim" -w /manim euclid-min-manim:0.21.0 manim --config_file animations/classification/manim.cfg animations/classification/classification.py ConicClassification
 ```
 
-母片位于 `media/videos/classification/2160p60/ConicClassification.mp4`。沿用已有 Manim 0.21.0 与 Noto Sans CJK SC 镜像，也可用本目录 Dockerfile 重建。
+母片位于 `animations/classification/media/videos/classification/2160p60/ConicClassification.mp4`。沿用已有 Manim 0.21.0 与 Noto Sans CJK SC 镜像，也可用本目录 Dockerfile 重建。
 
 播放版通过 FFmpeg 复制视频流并将索引前置。
 
@@ -63,7 +63,7 @@ ffmpeg -y -i animations/classification/media/videos/classification/2160p60/Conic
 
 ## 5. 视觉检查
 
-检查原理页、两组平行弦、直径平行或相交、五点切线的辅助线、同侧或异侧结果。辅助点标签采用避让，前一阶段的辅助说明逐步淡出。`preview.png` 来自正式成片。
+检查原理页、两组平行弦、直径平行或相交、五点切线的辅助线、同侧或异侧结果。辅助点标签采用避让，并优先保持与所属点的最近关系。相邻圆点按间距缩小，切线作成后局部放大 $U,T,Q$，以引线明确标签归属。放大图中的点线使用同一相似变换，点线关联由回归测试检查。前一阶段的辅助说明逐步淡出。`preview.png` 来自正式成片。
 
 ## 6. 与文档的逐项核对
 
@@ -77,7 +77,7 @@ ffmpeg -y -i animations/classification/media/videos/classification/2160p60/Conic
 
 片中椭圆、双曲线的切线构造均采用第一对辅助线平行的分支，交点 $S$ 由平行方向替代。椭圆案例的中心恰与已有中点 $M_2$ 重合，字幕明确说明同一点的名称变化。
 
-切线阶段依照 CONSTRUCTION 第 2 节先画齐 $BC,DA,UD,AB,CU$ 五条辅助线，再取得辅助交点并作对应分支。动作顺序回归检查直接调用动画的切线作图方法，核对辅助点出现前其父直线已经画出，并覆盖全部五类切线分支。另检查水平线、竖直线和斜线在多种显示比例下的点线关联。
+切线阶段依照 CONSTRUCTION 第 2 节先画齐 $BC,DA,UD,AB,CU$ 五条辅助线，再取得辅助交点并作对应分支。四组回归测试直接调用动画方法，核对辅助点出现前其父直线已经画出，并覆盖全部五类切线分支。另检查水平线、竖直线和斜线在多种显示比例下的点线关联，以及两个中心型案例中 $U,Q$ 圆点分离、标签归属和放大图的点线关联。
 
 ```powershell
 docker run --rm --network none -e PYTHONDONTWRITEBYTECODE=1 -v "${PWD}:/manim:ro" -w /manim euclid-min-manim:0.21.0 python -m unittest discover -s animations/classification -p 'test_*.py' -v
