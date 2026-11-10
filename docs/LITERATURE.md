@@ -6,7 +6,7 @@
 
 本次读取的本地版本与 GitHub `main` 一致，提交为 `50cccad292a296087770a377080dcde9ef40657b`。原始问答按原样保存在 [sources/original_conic_qa.md](../sources/original_conic_qa.md)。[题集仓库](https://github.com/lenovobenben/ai-math-notes)
 
-原题要求可见弧不对称、且不含曲线顶点。本项目按照研究路线图和用户确认后的题面，覆盖任意位置的非零长度弧，包含对称弧和含顶点弧，并排除圆。
+原题要求可见弧不对称、且不含曲线顶点。本项目按照用户确认后的题面，覆盖任意位置的非零长度弧，包含对称弧和含顶点弧，并排除圆。
 
 ## 2. 原始个人思路
 

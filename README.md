@@ -97,4 +97,3 @@ docker run --rm --network none -e PYTHONDONTWRITEBYTECODE=1 -v "${PWD}:/workspac
 | 命令与环境 | [REPRODUCING](docs/REPRODUCING.md) |
 | 来源、原作法与订正 | [LITERATURE](docs/LITERATURE.md) |
 | 原始问答快照 | [sources](sources/README.md) |
-| 六个后续项目与系列安排 | [研究路线图](docs/Euclid十题研究路线图.md) |
