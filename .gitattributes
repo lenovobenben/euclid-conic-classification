@@ -1,0 +1,3 @@
+*.py text eol=lf
+*.json text eol=lf
+sources/original_conic_qa.md -text
