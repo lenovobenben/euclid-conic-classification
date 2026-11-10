@@ -50,7 +50,7 @@ class ConicClassification(Scene):
     def principle_page(self):
         title = self.text("圆锥曲线弧的尺规判定", 43).move_to([0, 2.6, 0])
         lines = [
-            ("平行弦的中点确定直径", 1.45, AUXILIARY),
+            ("两组不同方向的平行弦，各组中点连线为直径", 1.45, AUXILIARY),
             ("两条直径平行 → 抛物线", 0.65, FOREGROUND),
             ("两条直径相交 → 取得中心 O，作 A 处切线 t", -0.15, FOREGROUND),
             ("中心 O 与弧上点 B 位于切线 t 同侧 → 椭圆", -1.05, RESULT),
@@ -195,7 +195,11 @@ class ConicClassification(Scene):
             self.play(*[line.animate.set_color(RESULT).set_stroke(width=2) for line in diameters], run_time=0.6)
             self.show_result("抛物线")
         else:
-            self.caption("两条直径相交，取得中心 O")
+            center_position = self.at(data["center"])
+            existing_name = next((name for name, (dot, label) in self.markers.items()
+                                  if np.linalg.norm(dot.get_center() - center_position) < 1e-6), None)
+            self.caption(f"两条直径交于已有点 {existing_name}，记为中心 O" if existing_name
+                         else "两条直径相交，取得中心 O")
             self.mark("O", data["center"], LEFT, RESULT)
             self.wait(0.8)
             keep = {"A", "B", "C", "D", "U", "O"}
@@ -231,6 +235,7 @@ class ConicClassification(Scene):
         self.draw_line(through(d, at), "连接 DA")
         self.draw_line(through(c, d), "连接 UD")
         self.draw_line(through(at, a), "连接 AB")
+        self.draw_line(through(b, c), "连接 CU")
         if trace["first"] is not None:
             self.mark("S", trace["first"], RIGHT)
         if trace["second"] is not None:
@@ -240,7 +245,6 @@ class ConicClassification(Scene):
                 "BC 与 DA 平行，过 T 作其平行线" if trace["first"] is None
                 else "UD 与 AB 平行，过 S 作其平行线")
             self.draw_line(trace["pascal_line"], caption)
-            self.draw_line(through(b, c), "连接 CU")
         if trace["auxiliary"] is not None:
             self.mark("Q", trace["auxiliary"], DOWN)
         self.caption("连接 AQ，得到 A 处切线 t" if trace["auxiliary"] is not None

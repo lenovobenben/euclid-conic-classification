@@ -2,7 +2,7 @@
 
 [观看 4K60 正式版](media/ConicClassification_4k60.mp4)
 
-正式成片为 3840 × 2160、60 fps，时长 75.35 秒，文件约 11.58 MB。
+正式成片为 3840 × 2160、60 fps，时长 75.35 秒，文件约 11.68 MB。
 
 ![直径、中心与切线判定](preview.png)
 
@@ -39,6 +39,12 @@
 
 在项目根目录运行。先生成已验证数据，再渲染预览或正式版。
 
+首次准备 Manim 环境时，可从本目录 Dockerfile 构建带 Noto Sans CJK SC 字体的镜像。
+
+```sh
+docker build -t euclid-min-manim:0.21.0 animations/classification
+```
+
 ```powershell
 docker run --rm --network none -e PYTHONDONTWRITEBYTECODE=1 -v "${PWD}:/workspace" -w /workspace sagemath/sagemath@sha256:4f5589eb6c565949a006f8665de2876b8414410daf5ac554f4434a15d4f3d528 sage -python experiments/verify.py --write
 
@@ -58,3 +64,21 @@ ffmpeg -y -i animations/classification/media/videos/classification/2160p60/Conic
 ## 5. 视觉检查
 
 检查原理页、两组平行弦、直径平行或相交、五点切线的辅助线、同侧或异侧结果。辅助点标签采用避让，前一阶段的辅助说明逐步淡出。`preview.png` 来自正式成片。
+
+## 6. 与文档的逐项核对
+
+| 视频步骤 | 文档对应 |
+|---|---|
+| 依次取 $A,B,C,D$ | ANSWER 第 2 节 |
+| 两组中点引导的平行弦与两条直径 | ANSWER 第 3、4 节 |
+| 直径平行或相交的判断 | ANSWER 第 5 节 |
+| $BC$ 与 $DA$ 平行时，过 $T$ 作对应平行线，再与 $CU$ 求交 | CONSTRUCTION 第 2 节的第一对平行分支 |
+| 切线 $t=AQ$，比较 $O,B$ 的侧别 | ANSWER 第 6、7 节 |
+
+片中椭圆、双曲线的切线构造均采用第一对辅助线平行的分支，交点 $S$ 由平行方向替代。椭圆案例的中心恰与已有中点 $M_2$ 重合，字幕明确说明同一点的名称变化。
+
+切线阶段依照 CONSTRUCTION 第 2 节先画齐 $BC,DA,UD,AB,CU$ 五条辅助线，再取得辅助交点并作对应分支。动作顺序回归检查直接调用动画的切线作图方法，核对辅助点出现前其父直线已经画出，并覆盖全部五类切线分支。另检查水平线、竖直线和斜线在多种显示比例下的点线关联。
+
+```powershell
+docker run --rm --network none -e PYTHONDONTWRITEBYTECODE=1 -v "${PWD}:/manim:ro" -w /manim euclid-min-manim:0.21.0 python -m unittest discover -s animations/classification -p 'test_*.py' -v
+```

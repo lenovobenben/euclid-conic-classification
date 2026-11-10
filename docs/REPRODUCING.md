@@ -67,7 +67,13 @@ docker run --rm --network none -e PYTHONDONTWRITEBYTECODE=1 -v "${PWD}:/workspac
 
 ## 4. 渲染动画
 
-从项目根目录执行。720p30 预览命令如下。
+从项目根目录执行。首次准备 Manim 环境时构建带中文字体的镜像。
+
+```sh
+docker build -t euclid-min-manim:0.21.0 animations/classification
+```
+
+720p30 预览命令如下。
 
 ```powershell
 docker run --rm --network none -e PYTHONDONTWRITEBYTECODE=1 -v "${PWD}:/manim" -w /manim euclid-min-manim:0.21.0 manim --config_file animations/classification/manim.cfg -r 1280,720 --fps 30 animations/classification/classification.py ConicClassification

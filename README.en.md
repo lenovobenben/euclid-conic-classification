@@ -1,36 +1,91 @@
-# Euclid-Conic-Classification
+# Euclid-Conic-Classification · Straightedge-and-Compass Classification of a Conic Arc
 
 [简体中文](README.md) · **English**
 
-**Classify a visible conic arc through constructed diameters, a tangent and point-side relations.**
+**Classify a given conic arc as an ellipse, a parabola or a hyperbola using the geometric positions of parallel chords, diameters and a tangent.**
 
-The input is a nonzero connected arc of a nondegenerate real conic, promised to be a noncircular ellipse, a parabola or a hyperbola. Point selection in arc order and intersections of constructed lines with the visible arc are allowed. The method covers arbitrary short and long arcs, vertices and symmetry.
+The input is promised to lie on a nondegenerate real conic, with circles excluded by the problem definition. This project provides a finite straightedge-and-compass decision procedure covering the entire input domain, complete proofs, exact SageMath replays and a step-by-step animation. Arbitrarily short and long arcs, vertices and symmetric configurations are covered. The present goal is complete classification with reproducible verification. Move-count minimization is deferred.
 
-[4K60 construction animation](animations/classification/media/ConicClassification_4k60.mp4) · [Construction, Chinese](docs/ANSWER.md) · [Full-domain proof, Chinese](docs/PROOF.md)
+[Watch the 4K60 construction](https://raw.githubusercontent.com/lenovobenben/euclid-conic-classification/main/animations/classification/media/ConicClassification_4k60.mp4) · [Complete construction](docs/ANSWER.md) · [Correctness proof](docs/PROOF.md) · [SageMath verification](experiments/verify.py)
 
-## Geometric procedure
+[![Classification using parallel chords, diameters and a tangent](animations/classification/preview.png)](https://raw.githubusercontent.com/lenovobenben/euclid-conic-classification/main/animations/classification/media/ConicClassification_4k60.mp4)
 
-Choose four distinct points $A,B,C,D$ in arc order.
+*Click the preview to view or download the animation, 3840 × 2160, 60 fps, 75.35 seconds.*
 
-1. Through the midpoint of $AB$, draw a parallel to $AC$. Its two visible intersections determine a second parallel chord. Joining the chord midpoints gives the first diameter.
-2. Through the midpoint of $AC$, draw a parallel to $AD$. Repeat to obtain the second diameter.
-3. Parallel diameters identify a parabola.
-4. Otherwise their intersection is the center $O$. Construct the tangent $t$ at $A$ from five already available points using the degenerate Pascal construction.
-5. The points $O,B$ lie on the same side of $t$ for an ellipse, and on opposite sides of $t$ for a hyperbola.
+## Explore the construction
 
-The construction uses classical midpoint and parallel macros. Its final output comes from incidence and side relations. All parallel cases in the tangent construction have explicit finite fallback steps.
+| Animation | Video | Target |
+|---|---|---|
+| Classifying a conic arc | [4K60 MP4](https://raw.githubusercontent.com/lenovobenben/euclid-conic-classification/main/animations/classification/media/ConicClassification_4k60.mp4) | Independent complete construction and classification examples for an ellipse, a parabola and a hyperbola |
 
-## Full-domain guarantee
+The video has Chinese captions and follows Euclid-CCC-Min's dark-blue background and fine-line style. Magenta denotes the input arc and initial points, gold the current construction, pale blue auxiliary objects, and green the objects involved in the final decision and the resulting category.
 
-Every ordered quadruple of distinct arc points works. Continuity guarantees both intersections of each auxiliary parallel lie on the visible arc. The two chord directions differ automatically. The midpoint-diameter theorem separates parabolas from central conics, and the tangent-side test separates ellipses from hyperbolas. All construction branches and exclusions are proved in [PROOF](docs/PROOF.md).
+One opening page summarizes the principle. The remainder shows parallel chords, chord midpoints, two diameters, the center and a tangent. Midpoints and parallels use standard straightedge-and-compass macros, with some routine auxiliary circles omitted. Detailed reasoning is provided in the documents.
 
-Step minimization is deferred. Algebraic five-point interpolation and discriminant calculations are preserved as a separate theoretical and verification reference in [ALGEBRA](docs/ALGEBRA.md).
+Geometry is exported after exact verification, and Manim checks its data hash when loading. Both central-conic examples use a parallel branch of the five-point tangent construction. The ellipse example explicitly identifies the existing midpoint $M_2$ with the center $O$. See the [animation guide](animations/classification/README.md) for the storyboard, construction-order tests and rendering.
+
+## Current classification results and scope
+
+| Constructed relation | Classification |
+|---|---|
+| The two diameters are parallel | Parabola |
+| The diameters meet, and the center $O$ and arc point $B$ lie on the same side of tangent $t$ | Ellipse |
+| The diameters meet, and $O,B$ lie on opposite sides of $t$ | Hyperbola |
+
+### Construction outline
+
+Select four distinct points $A,B,C,D$ in arc order.
+
+1. Through the midpoint of $AB$, draw a parallel to $AC$ and obtain its two intersections with the visible arc. Join the midpoints of the two parallel chords to obtain diameter $d_1$.
+2. Reuse the midpoint of $AC$, draw a parallel to $AD$ and obtain the second diameter $d_2$ in the same way.
+3. If the diameters are parallel, output parabola.
+4. If they meet, obtain the center $O$. Use five already available points to construct tangent $t$ at $A$.
+5. Compare the sides of $t$ containing $O$ and $B$, and output ellipse or hyperbola.
+
+Every point is obtained by point selection, intersection or midpoint construction from available objects. The final category follows from point-line positions. [Complete construction](docs/ANSWER.md) · [Five-point tangent and parallel branches](docs/CONSTRUCTION.md)
+
+### Why the procedure covers the full domain
+
+Every choice of four distinct points in arc order works. Midpoint guides guarantee exactly two visible intersections for each auxiliary parallel, and the two chord directions differ automatically. For a central conic the two diameters meet uniquely at its center. For a parabola they are distinct and parallel.
+
+The five-point tangent construction has explicit finite steps for finite auxiliary intersections, one parallel pair, two parallel pairs and a parallel final step. The tangent-side test gives strictly different outcomes for ellipses and hyperbolas. The three outputs are mutually exclusive and exhaust the promised input domain. [General proof](docs/PROOF.md) · [Special configurations and coverage](docs/CASES.md)
+
+## Problem and straightedge-and-compass operations
+
+The input is a nonzero connected arc, promised to belong to a noncircular ellipse, a parabola or a hyperbola. Endpoints may be unmarked. Vertices and symmetry are allowed. A connected hyperbola arc lies on one branch.
+
+Selecting four distinct points in arc order and obtaining intersections of specified lines with the visible arc are allowed. The remaining elementary operations draw a line through two existing points, draw a circle centered at an existing point through another, and obtain finite real intersections of lines and circles. The tools follow the preceding four projects' unmarked-straightedge and collapsing-compass semantics.
+
+Midpoints, perpendiculars and parallels use classical constructions. Exact parallelism, incidence, equality and line-order relations select branches. A side comparison can also be performed by joining the two points and checking whether its intersection with the tangent lies between them.
+
+Coordinates in the proofs and replays explain geometric relations. The actual procedure follows the point-line construction steps. See [DESIGN](docs/DESIGN.md) for the full input and operation model.
+
+## Sources and project contribution
+
+The problem and initial parallel-chord midpoint and diameter ideas come from the author's original “圆锥曲线作图判定” exchange in `ai-math-notes`. The historical conversation and corrections are preserved with attribution. [Original exchange](sources/original_conic_qa.md) · [Source ledger](docs/LITERATURE.md)
+
+This project supplies fixed midpoint guides and a finite-existence proof for selecting the parallel chords. It then uses the classical degenerate Pascal theorem to construct a tangent and completes the unified arbitrary-arc classification through side relations. The deliverables include a full-domain proof, all parallel branches, independent exact verification and a construction animation.
+
+Five-point interpolation and discriminant classification are preserved as another theoretical and verification route in [algebraic verification](docs/ALGEBRA.md) and the [constructible-arithmetic appendix](docs/ARITHMETIC.md). The diameter, Pascal and conic-classification theories are classical. See [LITERATURE](docs/LITERATURE.md) for sources and contribution boundaries.
 
 ## Exact verification
 
-SageMath 10.7 verifies four general geometric identities, 160 geometric construction replays and 388 tangent constructions including every parallel fallback. Independent algebraic checks retain 18 identities and interpolation witnesses, 16 exact fixtures, all 1,920 point permutations, 95 signed-arithmetic checks and five invalid-input controls.
+Formal decisions use rational numbers, polynomial rings and the exact real algebraic field `AA` in SageMath 10.7. The geometric replay constructs chord intersections, midpoints, diameters, centers and tangents. Each constructed tangent is independently compared with the exact gradient line of the source conic.
 
-All mathematical decisions use rational numbers, symbolic polynomials and the exact real algebraic field `AA`. Tiny-arc and near-parabolic cases are included. The general coverage guarantee is supplied by the proof.
+| Check | Result | Entry point or record |
+|---|---|---|
+| General geometric identities | Four passed, including the midpoint and degenerate Pascal relations | [Geometric verification](experiments/verify_geometry.py) |
+| Geometric decision procedure | 16 fixture families and 160 ordered-quadruple and reversal checks passed | [Verification report](experiments/results/verification.json) |
+| Five-point tangents | 388 passed, with exact checks for all five branch types | [Geometric verification](experiments/verify_geometry.py) |
+| Independent algebraic route | 18 identities and interpolation witnesses, plus 1,920 point permutations passed | [Five-point classification and independent equation recovery](experiments/conic_classifier.py) |
+| Arithmetic appendix and invalid inputs | 95 arithmetic checks passed, with zero-divisor and five invalid-input rejections | [Unified verification entry point](experiments/verify.py) |
+| Animation actions and display geometry | Three regression groups passed, checking parent-object order, tangent branches and screen incidence | [Animation tests](animations/classification/test_classification.py) |
+
+Fixtures include tiny arcs with parameter spacing $10^{-12}$ and near-parabolic conics with parameters $\pm10^{-30}$. General proofs establish full-domain coverage. Exact fixtures and animation checks verify the implementation and presentation. [Verification layers](docs/VERIFICATION.md)
+
+## Reproduction
+
+Run the verification with SageMath 10.7 from the project root. The following command uses a pinned Docker image, read-only mounting and disabled networking on macOS/Linux.
 
 ```sh
 docker run --rm --network none \
@@ -40,10 +95,58 @@ docker run --rm --network none \
   sage -python experiments/verify.py
 ```
 
-Run from the project root. The expected exit status is zero and `valid` is `true`. Windows, regeneration and rendering commands are in [REPRODUCING](docs/REPRODUCING.md).
+The expected exit status is zero, with these report fields.
 
-## Animation and sources
+```json
+{
+  "valid": true,
+  "sage_version": "10.7",
+  "fixture_count": 16,
+  "point_permutation_count": 1920,
+  "geometric_solution": {
+    "construction_count": 160,
+    "tangent_count": 388
+  }
+}
+```
 
-The 75.35-second 4K60 Manim video opens with one brief principle page, followed by the actual construction flow and final classifications. Some standard midpoint and parallel auxiliary circles are omitted for clarity. Full reasoning is provided in the documents. Geometry and decisions are exported after exact verification and checked by hash before rendering.
+With SageMath installed, run `sage -python experiments/verify.py` directly. Windows PowerShell commands, report regeneration and environment details are in [REPRODUCING](docs/REPRODUCING.md).
 
-The problem and parallel-chord midpoint idea come from the user's original `ai-math-notes` exchange. The historical conversation and corrections are preserved with attribution. The four completed Euclid projects remain methodological and visual references. [Source discussion](docs/LITERATURE.md) · [Original exchange](sources/original_conic_qa.md)
+Animation-action regression tests use a Manim environment.
+
+```sh
+docker run --rm --network none \
+  -e PYTHONDONTWRITEBYTECODE=1 \
+  -v "$PWD:/manim:ro" -w /manim \
+  euclid-min-manim:0.21.0 \
+  python -m unittest discover -s animations/classification -p 'test_*.py' -v
+```
+
+See the [animation guide](animations/classification/README.md) for building the Manim image, exporting geometry, rendering a 720p30 preview and producing the 4K60 video.
+
+## Documentation and code
+
+Detailed research documents are primarily in Chinese. The Chinese and English READMEs provide corresponding problem statements, results, scope and reproduction entry points.
+
+| Topic | Entry point |
+|---|---|
+| Inputs, output, tools and allowed operations | [DESIGN](docs/DESIGN.md) |
+| Complete geometric construction | [ANSWER](docs/ANSWER.md) |
+| Five-point tangent and all parallel branches | [CONSTRUCTION](docs/CONSTRUCTION.md) |
+| Correctness, coverage and termination | [PROOF](docs/PROOF.md) |
+| Special configurations and branch classification | [CASES](docs/CASES.md) |
+| Algebraic principles and independent verification | [ALGEBRA](docs/ALGEBRA.md), [ARITHMETIC](docs/ARITHMETIC.md) |
+| Verification layers, results and full commands | [VERIFICATION](docs/VERIFICATION.md), [REPRODUCING](docs/REPRODUCING.md) |
+| Historical materials, original ideas and contributions | [LITERATURE](docs/LITERATURE.md), [sources](sources/README.md) |
+| Geometric classifier and exact replay | [geometric_classifier.py](experiments/geometric_classifier.py), [verify.py](experiments/verify.py) |
+| Animation data, storyboard, tests and rendering | [Animation directory](animations/classification/README.md) |
+
+**Euclid geometry research series**
+
+[Euclid-Min](https://github.com/lenovobenben/euclid-min) · [Euclid-CCC-Min](https://github.com/lenovobenben/euclid-ccc-min) · [Euclid-Equal-Angle-Min](https://github.com/lenovobenben/euclid-equal-angle-min) · [Euclid-Castillon-Min](https://github.com/lenovobenben/euclid-castillon-min) · **Euclid-Conic-Classification**
+
+## License and citation
+
+Software, tests, build scripts and configuration use [Apache 2.0](LICENSE). Original mathematical documents, verification records, research data and animations use [CC BY 4.0](LICENSE-CONTENT). Historical snapshots, third-party materials and external dependencies retain their respective rights and licenses. See the [license scope](LICENSE-SCOPE.md).
+
+When citing this project, credit **lenovobenben, Euclid-Conic-Classification**, link to the [repository](https://github.com/lenovobenben/euclid-conic-classification), and identify the commit or version used. Attribute and mark changes to redistributed or adapted non-software material under CC BY 4.0.
