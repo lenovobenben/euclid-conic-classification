@@ -42,7 +42,11 @@ sage -python experiments/verify.py
   "sage_version": "10.7",
   "symbolic_identity_count": 18,
   "fixture_count": 16,
-  "point_permutation_count": 1920
+  "point_permutation_count": 1920,
+  "geometric_solution": {
+    "construction_count": 160,
+    "tangent_count": 388
+  }
 }
 ```
 

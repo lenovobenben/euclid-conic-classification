@@ -10,12 +10,13 @@ import json
 from itertools import permutations
 from pathlib import Path
 
-from sage.all import AA, QQ, ZZ, PolynomialRing, gcd, lcm, matrix, vector
+from sage.all import AA, QQ, PolynomialRing, matrix, vector
 from sage.env import SAGE_VERSION
 
 from conic_classifier import classify_five_points, exact_record, independent_conic
-from fixtures import animation_fixtures, canonical_point, verification_fixtures
+from fixtures import verification_fixtures
 from geometry_macros import add, divide, multiply, replay, subtract
+from verify_geometry import geometric_animation_data, verify_geometric_solution
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -186,58 +187,23 @@ def verify_arithmetic_macros():
     raise ArithmeticError("geometric division accepted a zero denominator")
 
 
-def animation_data():
-    scenes = []
-    for fixture in animation_fixtures():
-        state = classify_five_points(fixture["points"])
-        require(state["category"] == fixture["category"], "animation classification is wrong")
-        parameters = fixture["parameters"]
-        low, high = min(parameters), max(parameters)
-        curve = [canonical_point(fixture["category"], low + (high - low) * QQ(i) / 240)
-                 for i in range(241)]
-        curve = [fixture["linear"] * point + fixture["translation"] for point in curve]
-        for point in curve:
-            homogeneous_point = vector(AA, (*point, 1))
-            require(homogeneous_point * fixture["equation"] * homogeneous_point == 0,
-                    "animation arc sample lies off its conic")
-        coefficients = [QQ(value) for value in state["coefficients"]]
-        denominator = lcm([value.denominator() for value in coefficients])
-        integers = [ZZ(value * denominator) for value in coefficients]
-        common = gcd(integers)
-        if next(value for value in integers if value != 0) < 0:
-            common = -common
-        normalized = [value / common for value in integers]
-        normalized_delta = normalized[1] ** 2 - 4 * normalized[0] * normalized[2]
-        require(normalized_delta.sign() == state["delta"].sign(), "display normalization fails")
-        scenes.append({
-            "category": state["category"],
-            "points": [[float(value) for value in point] for point in fixture["points"]],
-            "arc": [[float(value) for value in point] for point in curve],
-            "local_points": [[exact_record(value) for value in point]
-                             for point in state["local_points"]],
-            "rows": [[exact_record(value) for value in row] for row in state["rows"]],
-            "coefficients": [exact_record(value) for value in state["coefficients"]],
-            "delta": exact_record(state["delta"]),
-            "sign": int(state["delta"].sign()),
-            "normalized_coefficients": [str(value) for value in normalized],
-            "normalized_delta": str(normalized_delta),
-        })
-    return {"schema_version": 1, "producer": "experiments/verify.py", "scenes": scenes}
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--write", action="store_true", help="save reports and animation geometry")
     args = parser.parse_args()
     identities = symbolic_verification()
-    fixtures = [verify_fixture(fixture) for fixture in verification_fixtures()]
+    inputs = verification_fixtures()
+    fixtures = [verify_fixture(fixture) for fixture in inputs]
     controls = negative_controls()
     arithmetic = verify_arithmetic_macros()
-    geometry = animation_data()
+    geometric = verify_geometric_solution(inputs)
+    geometry = geometric_animation_data()
     geometry_bytes = (json.dumps(geometry, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
     source_files = [Path(__file__), Path(__file__).with_name("conic_classifier.py"),
                     Path(__file__).with_name("fixtures.py"),
-                    Path(__file__).with_name("geometry_macros.py")]
+                    Path(__file__).with_name("geometry_macros.py"),
+                    Path(__file__).with_name("geometric_classifier.py"),
+                    Path(__file__).with_name("verify_geometry.py")]
     report = {
         "valid": True,
         "sage_version": SAGE_VERSION,
@@ -249,6 +215,7 @@ def main():
         "negative_controls": controls,
         "arithmetic_macro_checks": arithmetic,
         "fixtures": fixtures,
+        "geometric_solution": geometric,
         "animation_geometry_sha256": hashlib.sha256(geometry_bytes).hexdigest(),
         "source_sha256": {path.name: hashlib.sha256(path.read_bytes()).hexdigest()
                           for path in source_files},

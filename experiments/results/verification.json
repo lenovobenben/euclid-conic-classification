@@ -1006,11 +1006,128 @@
       "geometric_macro_replay": true
     }
   ],
-  "animation_geometry_sha256": "4ae786994b01fe1ae6d58bfce8f907c9d1036d6e8a625c9ea120307aba6c4bd6",
+  "geometric_solution": {
+    "symbolic_identities": [
+      "homogeneous degenerate Pascal identity",
+      "contact point lies on constructed tangent",
+      "general parallel-chord midpoint identity",
+      "hyperbola tangent-side square identity"
+    ],
+    "construction_count": 160,
+    "tangent_count": 388,
+    "tangent_branches": [
+      "both_parallel",
+      "finite",
+      "finite_parallel_tangent",
+      "first_parallel",
+      "second_parallel"
+    ],
+    "fixtures": [
+      {
+        "name": "ellipse_vertex_symmetric",
+        "category": "ellipse",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "ellipse_long_arc",
+        "category": "ellipse",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "ellipse_tiny_arc",
+        "category": "ellipse",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "ellipse_reflected_shear",
+        "category": "ellipse",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "ellipse_algebraic",
+        "category": "ellipse",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "hyperbola_vertex_symmetric",
+        "category": "hyperbola",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "hyperbola_left_branch",
+        "category": "hyperbola",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "hyperbola_tiny_arc",
+        "category": "hyperbola",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "hyperbola_near_asymptote",
+        "category": "hyperbola",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "hyperbola_rotated_translated",
+        "category": "hyperbola",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "parabola_vertex_symmetric",
+        "category": "parabola",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "parabola_tiny_arc",
+        "category": "parabola",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "parabola_sheared",
+        "category": "parabola",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "parabola_algebraic_point",
+        "category": "parabola",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "ellipse_near_parabola",
+        "category": "ellipse",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      },
+      {
+        "name": "hyperbola_near_parabola",
+        "category": "hyperbola",
+        "ordered_quadruples_with_reversal": 10,
+        "tangent_orders": 24
+      }
+    ]
+  },
+  "animation_geometry_sha256": "85636e983b4094b0ed673e65140e35c0f8a60a0a04cf95bd99d1927296bc1441",
   "source_sha256": {
-    "verify.py": "27745245a4f25b0ad1ad97e434a9d46c5a220347b08300f2ba3de9c78c15e1bb",
+    "verify.py": "8bd1eb60e891b584620ab97d362cbc36c1bd521906336d78765d2178db1eb943",
     "conic_classifier.py": "29043f841be33a60f00673c896ec592ee2fc6a6d79ec6a4dfe51d582c200f5ca",
-    "fixtures.py": "977901032aaaa2d7b43e1e8cf2a97ebb8df2efa9343cbbe23deced77f73d78a4",
-    "geometry_macros.py": "06df9c0111f299f9190c012daf6bd39ea4e15b04cdb8d2170642b154552da9c8"
+    "fixtures.py": "4b15091c9debc074eb5c361174b9f99073e7a7a381cf662b8209f46f9c054792",
+    "geometry_macros.py": "06df9c0111f299f9190c012daf6bd39ea4e15b04cdb8d2170642b154552da9c8",
+    "geometric_classifier.py": "b4aa319f3ea6c91e0ceb7467cf55483ac07ddbbb85555f0031a483ad624408df",
+    "verify_geometry.py": "ec414f4b49e31ddeccdbef68333d71c573cd5d3222e65bff70a80dcc2521f8df"
   }
 }

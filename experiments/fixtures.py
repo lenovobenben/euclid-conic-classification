@@ -104,13 +104,3 @@ def verification_fixtures():
                                       [0, -rational(1) / 2, 0]]),
         })
     return fixtures
-
-
-def animation_fixtures():
-    parameters = [-1, 1, 0, -QQ(1) / 2, QQ(1) / 2]
-    return [
-        make_fixture("ellipse", "ellipse", parameters),
-        make_fixture("parabola", "parabola", parameters),
-        make_fixture("hyperbola", "hyperbola",
-                     [-QQ(1) / 2, QQ(1) / 2, 0, -QQ(1) / 4, QQ(1) / 4]),
-    ]
